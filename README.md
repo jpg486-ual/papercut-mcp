@@ -56,6 +56,10 @@ In Cursor User Settings (JSON), add something like:
 - `papercut_get_user_properties`: Calls `api.getUserProperties(username, properties[])`. Returns `{ values: { property: value } }`.
 - `papercut_list_user_properties`: Returns a local list of documented user properties (no server call).
  - `papercut_list_printers`: Lists printers with paging via `api.listPrinters(offset, limit)`. Returns `{ printers: string[] }` where each entry is `ServerName\PrinterName`.
+ - `papercut_get_user_stats_total`: Returns lifetime totals for a user (pages, jobs) using `api.getUserProperties`.
+ - `papercut_get_user_account_balance`: Returns user account balance (primary by default) via `api.getUserAccountBalance`.
+ - `papercut_list_user_accounts`: Lists user accounts in pages via `api.listUserAccounts(offset, limit)`.
+ - `papercut_get_user_groups`: Returns groups for a user via `api.getUserGroups(username)`.
 
 Note: Exact property names and permissions depend on your installation. Official docs: https://www.papercut.com/help/manuals/ng-mf/common/tools-web-services/
 

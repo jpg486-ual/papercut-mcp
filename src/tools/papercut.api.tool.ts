@@ -138,5 +138,108 @@ export default {
         } as any;
       }
     );
+
+    // Get user's total stats (lifetime totals): pages and jobs
+    const GetUserStatsTotalArgs = z.object({ username: z.string() });
+    server.registerTool(
+      "papercut_get_user_stats_total",
+      {
+        title: "PaperCut Get User Stats (Total)",
+        description: "Obtiene contadores totales de usuario: páginas y trabajos impresos.",
+        inputSchema: GetUserStatsTotalArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const props = ["print-stats.page-count", "print-stats.job-count"];
+          const values = await client.call<(string | number)[]>("api.getUserProperties", [args.username, props]);
+          const [pageCountRaw, jobCountRaw] = values ?? [];
+          const pageCount = Number(pageCountRaw ?? 0);
+          const jobCount = Number(jobCountRaw ?? 0);
+          return { content: [{ type: "text", text: JSON.stringify({ pageCount, jobCount }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
+
+    // Get user account balance (optionally for a named account, defaults to primary)
+    const GetUserAccountBalanceArgs = z.object({
+      username: z.string(),
+      accountName: z.string().optional().describe("Optional. Defaults to primary if omitted."),
+    });
+    server.registerTool(
+      "papercut_get_user_account_balance",
+      {
+        title: "PaperCut Get User Account Balance",
+        description: "Obtiene el balance de la cuenta del usuario (primaria por defecto).",
+        inputSchema: GetUserAccountBalanceArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const params = args.accountName ? [args.username, args.accountName] : [args.username];
+          const balance = await client.call<number>("api.getUserAccountBalance", params);
+          return { content: [{ type: "text", text: JSON.stringify({ balance }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
+
+    // List user accounts (paged)
+    const ListUserAccountsArgs = z.object({
+      offset: z.number().int().min(0),
+      limit: z.number().int().min(1),
+    });
+    server.registerTool(
+      "papercut_list_user_accounts",
+      {
+        title: "PaperCut List User Accounts",
+        description: "Lista cuentas de usuario (paginado) vía api.listUserAccounts(offset, limit).",
+        inputSchema: ListUserAccountsArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const users = await client.call<string[]>("api.listUserAccounts", [args.offset, args.limit]);
+          return { content: [{ type: "text", text: JSON.stringify({ users }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
+
+    // Get user groups for a username
+    const GetUserGroupsArgs = z.object({ username: z.string() });
+    server.registerTool(
+      "papercut_get_user_groups",
+      {
+        title: "PaperCut Get User Groups",
+        description: "Devuelve los grupos a los que pertenece un usuario.",
+        inputSchema: GetUserGroupsArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const groups = await client.call<string[]>("api.getUserGroups", [args.username]);
+          return { content: [{ type: "text", text: JSON.stringify({ groups }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
   },
 };
