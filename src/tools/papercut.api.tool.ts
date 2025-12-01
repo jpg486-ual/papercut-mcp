@@ -8,14 +8,14 @@ export default {
   registerTools(server: McpServer) {
     // Registro de herramientas PaperCut usando el formato server.registerTool(...)
 
-    const PingArgs = z.object({});
+    const GetTotalUsersArgs = z.object({});
     server.registerTool(
-      "papercut_ping",
+      "papercut_get_total_users",
       {
-        title: "PaperCut Ping",
+        title: "PaperCut Get Total Users",
         description:
-          "Comprueba conectividad llamando a api.getTotalUsers (token-only).",
-        inputSchema: PingArgs,
+          "Returns the total number of users via api.getTotalUsers.",
+        inputSchema: GetTotalUsersArgs,
       },
       async () => {
         const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
@@ -23,11 +23,10 @@ export default {
         const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
         try {
           const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
-          // Método documentado sin parámetros adicionales: api.getTotalUsers
           const totalUsers = await client.call<number>("api.getTotalUsers");
-          return { content: [{ type: "text", text: JSON.stringify({ ok: true, totalUsers }) }] } as any;
+          return { content: [{ type: "text", text: JSON.stringify({ totalUsers }) }] } as any;
         } catch (err: any) {
-          return { content: [{ type: "text", text: JSON.stringify({ ok: false, error: err?.message || String(err) }) }] } as any;
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
         }
       }
     );

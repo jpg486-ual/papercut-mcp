@@ -1,36 +1,36 @@
 # papercut-mcp
 
-Servidor MCP (Model Context Protocol) en TypeScript que expone herramientas basadas en la API XML Web Services (XML‑RPC) de PaperCut NG/MF.
+TypeScript MCP (Model Context Protocol) server exposing tools backed by the PaperCut NG/MF XML Web Services (XML‑RPC) API.
 
-> Aviso: Proyecto en desarrollo activo. Se agradecen issues y pull requests para seguir mejorándolo.
+> Status: Actively developed. Issues and pull requests are welcome!
 
-## Requisitos
+## Requirements
 - Node.js 18+
-- PaperCut NG/MF con Web Services habilitado
-  - Configurar `auth.webservices.auth-token` en el admin
-  - Añadir tu IP a “Allowed XML Web Services callers” si no es localhost
+- PaperCut NG/MF with Web Services enabled
+  - Set `auth.webservices.auth-token` in the admin interface
+  - Add your caller IP under “Allowed XML Web Services callers” if not localhost
 
-## Instalación
+## Installation
 
 ```powershell
-# En PowerShell (Windows)
+# On PowerShell (Windows)
 Set-Location "c:\Users\jeperez\repos\papercut-mcp"
 Copy-Item .env.example .env
-# Edita .env y rellena PAPERCUT_XMLRPC_URL y PAPERCUT_AUTH_TOKEN
+# Edit .env to set PAPERCUT_XMLRPC_URL and PAPERCUT_AUTH_TOKEN
 npm install
 npm run build
 ```
 
-## Ejecución local
+## Local run
 
 ```powershell
 npm run start
 ```
 
-El servidor corre por stdio (no abre puerto). Normalmente lo invocará un cliente MCP (p. ej., Cursor).
+The server communicates over stdio (no listening port). It’s typically launched by an MCP client (e.g., Cursor).
 
-## Configuración de Cursor (ejemplo)
-En la configuración de Cursor (User Settings JSON), añade algo como:
+## Cursor configuration (example)
+In Cursor User Settings (JSON), add something like:
 
 ```json
 {
@@ -50,23 +50,23 @@ En la configuración de Cursor (User Settings JSON), añade algo como:
 }
 ```
 
-## Herramientas disponibles
-- `papercut_ping`: Comprueba conectividad usando `api.getTotalUsers` (solo token). Devuelve `{ ok, totalUsers }`.
-- `papercut_get_user_property`: Llama a `api.getUserProperty(username, property)`. Devuelve `{ value }`.
-- `papercut_get_user_properties`: Llama a `api.getUserProperties(username, properties[])`. Devuelve `{ values: {prop: valor} }`.
-- `papercut_list_user_properties`: Devuelve una lista local de propiedades de usuario documentadas (no llama al servidor).
+## Available tools
+- `papercut_get_total_users`: Returns the total number of users via `api.getTotalUsers`. Returns `{ totalUsers }`.
+- `papercut_get_user_property`: Calls `api.getUserProperty(username, property)`. Returns `{ value }`.
+- `papercut_get_user_properties`: Calls `api.getUserProperties(username, properties[])`. Returns `{ values: { property: value } }`.
+- `papercut_list_user_properties`: Returns a local list of documented user properties (no server call).
 
-Nota: Los nombres exactos de propiedades y permisos dependen de tu instalación. Documentación oficial: https://www.papercut.com/help/manuals/ng-mf/common/tools-web-services/
+Note: Exact property names and permissions depend on your installation. Official docs: https://www.papercut.com/help/manuals/ng-mf/common/tools-web-services/
 
-## Variables de entorno
-- `PAPERCUT_XMLRPC_URL` (p. ej. `http://localhost:9191/rpc/api/xmlrpc` o `https://<host>:9192/rpc/api/xmlrpc`)
-- `PAPERCUT_AUTH_TOKEN` (obligatoria)
-- `PAPERCUT_TIMEOUT_MS` (opcional, por defecto `10000`)
+## Environment variables
+- `PAPERCUT_XMLRPC_URL` (e.g., `http://localhost:9191/rpc/api/xmlrpc` or `https://<host>:9192/rpc/api/xmlrpc`)
+- `PAPERCUT_AUTH_TOKEN` (required)
+- `PAPERCUT_TIMEOUT_MS` (optional, default `10000`)
 
-## Desarrollo
+## Development
 
 ```powershell
 npm run dev
 ```
 
-Edita los ficheros en `src/`. Las herramientas MCP están en `src/tools/papercut.api.tool.ts` y el cliente XML‑RPC en `src/papercut.ts`.
+Edit files in `src/`. MCP tools live in `src/tools/papercut.api.tool.ts` and the XML‑RPC client in `src/papercut.ts`.
