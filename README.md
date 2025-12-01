@@ -60,6 +60,8 @@ In Cursor User Settings (JSON), add something like:
  - `papercut_get_user_account_balance`: Returns user account balance (primary by default) via `api.getUserAccountBalance`.
  - `papercut_list_user_accounts`: Lists user accounts in pages via `api.listUserAccounts(offset, limit)`.
  - `papercut_get_user_groups`: Returns groups for a user via `api.getUserGroups(username)`.
+ - `papercut_get_printer_property`: Gets a printer property via `api.getPrinterProperty(serverName, printerName, property)`.
+ - `papercut_get_group_members`: Lists members of a group (paged) via `api.getGroupMembers(groupName, offset, limit)`.
 
 Note: Exact property names and permissions depend on your installation. Official docs: https://www.papercut.com/help/manuals/ng-mf/common/tools-web-services/
 

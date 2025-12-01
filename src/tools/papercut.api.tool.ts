@@ -241,5 +241,59 @@ export default {
         }
       }
     );
+
+    // Get a printer property
+    const GetPrinterPropertyArgs = z.object({
+      serverName: z.string(),
+      printerName: z.string(),
+      property: z.string(),
+    });
+    server.registerTool(
+      "papercut_get_printer_property",
+      {
+        title: "PaperCut Get Printer Property",
+        description: "Obtiene una propiedad de impresora (api.getPrinterProperty).",
+        inputSchema: GetPrinterPropertyArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const value = await client.call<string>("api.getPrinterProperty", [args.serverName, args.printerName, args.property]);
+          return { content: [{ type: "text", text: JSON.stringify({ value }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
+
+    // Get members of a group (paged)
+    const GetGroupMembersArgs = z.object({
+      groupName: z.string(),
+      offset: z.number().int().min(0),
+      limit: z.number().int().min(1),
+    });
+    server.registerTool(
+      "papercut_get_group_members",
+      {
+        title: "PaperCut Get Group Members",
+        description: "Lista los miembros de un grupo (paginado) vía api.getGroupMembers.",
+        inputSchema: GetGroupMembersArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const members = await client.call<string[]>("api.getGroupMembers", [args.groupName, args.offset, args.limit]);
+          return { content: [{ type: "text", text: JSON.stringify({ members }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
   },
 };
