@@ -55,6 +55,7 @@ In Cursor User Settings (JSON), add something like:
 - `papercut_get_user_property`: Calls `api.getUserProperty(username, property)`. Returns `{ value }`.
 - `papercut_get_user_properties`: Calls `api.getUserProperties(username, properties[])`. Returns `{ values: { property: value } }`.
 - `papercut_list_user_properties`: Returns a local list of documented user properties (no server call).
+ - `papercut_list_printers`: Lists printers with paging via `api.listPrinters(offset, limit)`. Returns `{ printers: string[] }` where each entry is `ServerName\PrinterName`.
 
 Note: Exact property names and permissions depend on your installation. Official docs: https://www.papercut.com/help/manuals/ng-mf/common/tools-web-services/
 

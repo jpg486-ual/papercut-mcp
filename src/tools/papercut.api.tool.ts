@@ -89,6 +89,32 @@ export default {
       }
     );
 
+    // List printers with paging: api.listPrinters(offset, limit)
+    const ListPrintersArgs = z.object({
+      offset: z.number().int().min(0).describe("Starting index (0-based)."),
+      limit: z.number().int().min(1).describe("Batch size (recommended up to 1000)."),
+    });
+    server.registerTool(
+      "papercut_list_printers",
+      {
+        title: "PaperCut List Printers",
+        description: "List printers (paged) via api.listPrinters(offset, limit).",
+        inputSchema: ListPrintersArgs,
+      },
+      async (args: any) => {
+        const xmlrpcUrl = config.get("PAPERCUT_XMLRPC_URL", "http://localhost:9191/rpc/api/xmlrpc")!;
+        const authToken = config.get("PAPERCUT_AUTH_TOKEN", "")!;
+        const timeoutMs = config.getNumber("PAPERCUT_TIMEOUT_MS", 10000)!;
+        try {
+          const client = await createPapercutClient({ xmlrpcUrl, authToken, timeoutMs });
+          const printers = await client.call<string[]>("api.listPrinters", [args.offset, args.limit]);
+          return { content: [{ type: "text", text: JSON.stringify({ printers }) }] } as any;
+        } catch (err: any) {
+          return { content: [{ type: "text", text: JSON.stringify({ error: err?.message || String(err) }) }] } as any;
+        }
+      }
+    );
+
     // List available (documented) user properties
     const ListUserPropsArgs = z.object({});
     server.registerTool(
